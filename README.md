@@ -1,3 +1,3 @@
-# Mon Portfolio
+# Portfolio Martin Vidal
 
-Réalisé en HTML/CSSJavaScript
+Portfolio personnel réalisé en HTML, CSS et JavaScript.

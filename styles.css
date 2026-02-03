@@ -847,6 +847,14 @@ ul {
     background-image: url(assets/projects/crud-tv-show.png);
 }
 
+.project-card__image--vizu-algeau {
+    background-image: url(assets/projects/vizu-light-screen.png);
+}
+
+.project-card__image--portfolio {
+    background-image: url(assets/projects/portfolio-screenshot.png);
+}
+
 .project-card__overlay {
     position: relative;
     flex: 1;
