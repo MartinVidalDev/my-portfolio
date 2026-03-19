@@ -1,155 +1,253 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const announcementBanner = document.getElementById('announcement-banner');
-    const closeBannerBtn = document.getElementById('close-banner');
+document.addEventListener("DOMContentLoaded", () => {
+  const announcementBanner = document.getElementById("announcement-banner");
+  const closeBannerBtn = document.getElementById("close-banner");
 
-    if (announcementBanner && closeBannerBtn) {
-        const bannerClosed = localStorage.getItem('announcementBannerClosed');
-        
-        if (bannerClosed === 'true') {
-            announcementBanner.style.display = 'none';
-        }
+  if (announcementBanner && closeBannerBtn) {
+    const bannerClosed = localStorage.getItem("announcementBannerClosed");
 
-        closeBannerBtn.addEventListener('click', () => {
-            announcementBanner.classList.add('hidden');
-            
-            localStorage.setItem('announcementBannerClosed', 'true');
-            
-            setTimeout(() => {
-                announcementBanner.style.display = 'none';
-            }, 400);
-        });
+    if (bannerClosed === "true") {
+      announcementBanner.style.display = "none";
     }
 
-    const navToggle = document.querySelector('.nav-toggle');
-    const nav = document.querySelector('.site-nav');
+    closeBannerBtn.addEventListener("click", () => {
+      announcementBanner.classList.add("hidden");
 
-    if (navToggle && nav) {
-        const toggleNav = () => {
-            const expanded = navToggle.getAttribute('aria-expanded') === 'true';
-            navToggle.setAttribute('aria-expanded', String(!expanded));
-            nav.classList.toggle('is-open', !expanded);
-        };
+      localStorage.setItem("announcementBannerClosed", "true");
 
-        navToggle.addEventListener('click', () => {
-            toggleNav();
-        });
+      setTimeout(() => {
+        announcementBanner.style.display = "none";
+      }, 400);
+    });
+  }
 
-        nav.addEventListener('click', (event) => {
-            if (event.target instanceof HTMLAnchorElement && nav.classList.contains('is-open')) {
-                toggleNav();
-            }
-        });
-    }
+  const navToggle = document.querySelector(".nav-toggle");
+  const nav = document.querySelector(".site-nav");
 
-    const animatedElements = document.querySelectorAll('[data-animate]');
+  if (navToggle && nav) {
+    const toggleNav = () => {
+      const expanded = navToggle.getAttribute("aria-expanded") === "true";
+      navToggle.setAttribute("aria-expanded", String(!expanded));
+      nav.classList.toggle("is-open", !expanded);
+    };
 
-    if (animatedElements.length > 0 && 'IntersectionObserver' in window) {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        const target = entry.target;
-                        const delay = target.getAttribute('data-delay');
-
-                        if (delay) {
-                            target.style.transitionDelay = `${Number(delay) / 1000}s`;
-                        }
-
-                        target.classList.add('is-visible');
-                        observer.unobserve(target);
-                    }
-                });
-            },
-            {
-                threshold: 0.2,
-            },
-        );
-
-        animatedElements.forEach((element) => observer.observe(element));
-    } else {
-        animatedElements.forEach((element) => element.classList.add('is-visible'));
-    }
-
-    const internalLinks = document.querySelectorAll('a[href^="#"]');
-    internalLinks.forEach((link) => {
-        link.addEventListener('click', (event) => {
-            const targetId = link.getAttribute('href');
-            if (!targetId || targetId === '#' || targetId.length <= 1) {
-                return;
-            }
-
-            const targetElement = document.querySelector(targetId);
-            if (targetElement) {
-                event.preventDefault();
-                targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                history.replaceState(null, '', targetId);
-            }
-        });
+    navToggle.addEventListener("click", () => {
+      toggleNav();
     });
 
-    // Gestion du formulaire de contact
-    const contactForm = document.getElementById('contact-form');
-    const formMessage = document.getElementById('form-message');
-    const submitBtn = document.getElementById('submit-btn');
-    const btnText = submitBtn.querySelector('.btn-text');
-    const btnLoader = submitBtn.querySelector('.btn-loader');
+    nav.addEventListener("click", (event) => {
+      if (
+        event.target instanceof HTMLAnchorElement &&
+        nav.classList.contains("is-open")
+      ) {
+        toggleNav();
+      }
+    });
+  }
 
-    if (contactForm) {
-        contactForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
+  const animatedElements = document.querySelectorAll("[data-animate]");
 
-            const formData = new FormData(contactForm);
-            const data = {
-                name: formData.get('name'),
-                email: formData.get('email'),
-                message: formData.get('message'),
-            };
+  if (animatedElements.length > 0 && "IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const target = entry.target;
+            const delay = target.getAttribute("data-delay");
 
-            // Validation basique
-            if (!data.name || !data.email || !data.message) {
-                showMessage('Veuillez remplir tous les champs.', 'error');
-                return;
+            if (delay) {
+              target.style.transitionDelay = `${Number(delay) / 1000}s`;
             }
 
-            // État de chargement
-            submitBtn.disabled = true;
-            btnText.style.display = 'none';
-            btnLoader.style.display = 'inline-flex';
-            formMessage.style.display = 'none';
-
-            try {
-                const response = await fetch('https://formspree.io/f/xdkpqgpp', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data),
-                });
-
-                if (response.ok) {
-                    showMessage('✓ Message envoyé avec succès !', 'success');
-                    contactForm.reset();
-                } else {
-                    throw new Error('Erreur lors de l\'envoi');
-                }
-            } catch (error) {
-                showMessage('✗ Une erreur est survenue. Veuillez réessayer ou me contacter directement par email.', 'error');
-                console.error('Erreur:', error);
-            } finally {
-                submitBtn.disabled = false;
-                btnText.style.display = 'inline';
-                btnLoader.style.display = 'none';
-            }
+            target.classList.add("is-visible");
+            observer.unobserve(target);
+          }
         });
-    }
+      },
+      {
+        threshold: 0.2,
+      },
+    );
 
-    function showMessage(message, type) {
-        formMessage.textContent = message;
-        formMessage.className = 'form-message ' + type;
-        formMessage.style.display = 'block';
+    animatedElements.forEach((element) => observer.observe(element));
+  } else {
+    animatedElements.forEach((element) => element.classList.add("is-visible"));
+  }
 
-        setTimeout(() => {
-            formMessage.style.display = 'none';
-        }, 5000);
-    }
+  const internalLinks = document.querySelectorAll('a[href^="#"]');
+  internalLinks.forEach((link) => {
+    link.addEventListener("click", (event) => {
+      const targetId = link.getAttribute("href");
+      if (!targetId || targetId === "#" || targetId.length <= 1) {
+        return;
+      }
+
+      const targetElement = document.querySelector(targetId);
+      if (targetElement) {
+        event.preventDefault();
+        targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
+        history.replaceState(null, "", targetId);
+      }
+    });
+  });
+
+  // Gestion du formulaire de contact
+  const contactForm = document.getElementById("contact-form");
+  const formMessage = document.getElementById("form-message");
+  const submitBtn = document.getElementById("submit-btn");
+  const btnText = submitBtn.querySelector(".btn-text");
+  const btnLoader = submitBtn.querySelector(".btn-loader");
+
+  if (contactForm) {
+    contactForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const formData = new FormData(contactForm);
+      const data = {
+        name: formData.get("name"),
+        email: formData.get("email"),
+        message: formData.get("message"),
+      };
+
+      // Validation basique
+      if (!data.name || !data.email || !data.message) {
+        showMessage("Veuillez remplir tous les champs.", "error");
+        return;
+      }
+
+      // État de chargement
+      submitBtn.disabled = true;
+      btnText.style.display = "none";
+      btnLoader.style.display = "inline-flex";
+      formMessage.style.display = "none";
+
+      try {
+        const response = await fetch("https://formspree.io/f/xdkpqgpp", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (response.ok) {
+          showMessage("✓ Message envoyé avec succès !", "success");
+          contactForm.reset();
+        } else {
+          throw new Error("Erreur lors de l'envoi");
+        }
+      } catch (error) {
+        showMessage(
+          "✗ Une erreur est survenue. Veuillez réessayer ou me contacter directement par email.",
+          "error",
+        );
+        console.error("Erreur:", error);
+      } finally {
+        submitBtn.disabled = false;
+        btnText.style.display = "inline";
+        btnLoader.style.display = "none";
+      }
+    });
+  }
+
+  function showMessage(message, type) {
+    formMessage.textContent = message;
+    formMessage.className = "form-message " + type;
+    formMessage.style.display = "block";
+
+    setTimeout(() => {
+      formMessage.style.display = "none";
+    }, 5000);
+  }
+
+  const galleryTriggers = Array.from(
+    document.querySelectorAll(
+      '.event-card__gallery-trigger[data-gallery="events"]',
+    ),
+  );
+  const lightbox = document.getElementById("event-lightbox");
+  const lightboxImage = document.getElementById("lightbox-image");
+  const lightboxCaption = document.getElementById("lightbox-caption");
+  const lightboxClose = document.querySelector(".lightbox__close");
+  const lightboxPrev = document.querySelector(".lightbox__nav--prev");
+  const lightboxNext = document.querySelector(".lightbox__nav--next");
+
+  if (
+    galleryTriggers.length > 0 &&
+    lightbox &&
+    lightboxImage &&
+    lightboxCaption &&
+    lightboxClose &&
+    lightboxPrev &&
+    lightboxNext
+  ) {
+    let activeIndex = 0;
+
+    const updateLightbox = (index) => {
+      activeIndex = (index + galleryTriggers.length) % galleryTriggers.length;
+      const trigger = galleryTriggers[activeIndex];
+      const imageSrc = trigger.getAttribute("href") || "";
+      const caption =
+        trigger.getAttribute("data-caption") ||
+        trigger.querySelector("img")?.alt ||
+        "";
+
+      lightboxImage.setAttribute("src", imageSrc);
+      lightboxImage.setAttribute("alt", caption);
+      lightboxCaption.textContent = caption;
+    };
+
+    const openLightbox = (index) => {
+      updateLightbox(index);
+      lightbox.classList.add("is-open");
+      lightbox.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    };
+
+    const closeLightbox = () => {
+      lightbox.classList.remove("is-open");
+      lightbox.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    };
+
+    galleryTriggers.forEach((trigger, index) => {
+      trigger.addEventListener("click", (event) => {
+        event.preventDefault();
+        openLightbox(index);
+      });
+    });
+
+    lightboxPrev.addEventListener("click", () => {
+      updateLightbox(activeIndex - 1);
+    });
+
+    lightboxNext.addEventListener("click", () => {
+      updateLightbox(activeIndex + 1);
+    });
+
+    lightboxClose.addEventListener("click", closeLightbox);
+
+    lightbox.addEventListener("click", (event) => {
+      if (event.target === lightbox) {
+        closeLightbox();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (!lightbox.classList.contains("is-open")) {
+        return;
+      }
+
+      if (event.key === "Escape") {
+        closeLightbox();
+      }
+
+      if (event.key === "ArrowLeft") {
+        updateLightbox(activeIndex - 1);
+      }
+
+      if (event.key === "ArrowRight") {
+        updateLightbox(activeIndex + 1);
+      }
+    });
+  }
 });
